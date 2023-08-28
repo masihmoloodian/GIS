@@ -11,4 +11,7 @@ docker compose -f docker-compose-local.yml up -d
 ```
 
 # Run application (watch mode)
-`npm run start:dev`
+```
+cp env.sample .env
+npm run start:dev
+```
