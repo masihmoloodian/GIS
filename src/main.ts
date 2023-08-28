@@ -1,18 +1,29 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
+import configuration from './config/configuration';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  const config = new DocumentBuilder()
+  const swaggerOptions = new DocumentBuilder()
     .setTitle('GIS')
     .setDescription('The GIS API description')
     .setVersion('1.0')
     .build();
-  const document = SwaggerModule.createDocument(app, config);
+  const document = SwaggerModule.createDocument(app, swaggerOptions);
   SwaggerModule.setup('docs', app, document);
 
-  await app.listen(3000);
+  const config = app.get(ConfigService)
+
+  await app
+    .listen(config.get<number>('app.port'), config.get('app.host'))
+    .then(() =>
+      console.info(
+        `Server is running on http://${config.get<string>('app.host')}:${config.get<number>('app.port')}`,
+        `\nSwagger is running on http://${config.get<string>('app.host')}:${config.get<number>('app.port')}/docs`
+      )
+    )
 }
 bootstrap();
