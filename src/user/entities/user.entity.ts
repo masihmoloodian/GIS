@@ -1,6 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, OneToMany } from 'typeorm';
 import { ParentEntity } from '../shared/entities/parent.entity';
 import { hash } from 'bcrypt';
+import { MapEntity } from 'src/map/entities/map.entity';
+import { PointEntity } from 'src/point/entities/point.entity';
+import { AreaEntity } from 'src/area/entities/area.entity';
 
 @Entity('users')
 export class UserEntity extends ParentEntity {
@@ -17,6 +20,15 @@ export class UserEntity extends ParentEntity {
 
     @Column()
     password: string;
+
+    @OneToMany(() => MapEntity, (maps) => maps.user)
+    maps: MapEntity[]
+
+    @OneToMany(() => PointEntity, (points) => points.user)
+    points: PointEntity[]
+
+    @OneToMany(() => AreaEntity, (areas) => areas.user)
+    areas: AreaEntity[]
 
     @BeforeInsert()
     async hashPassword() {
