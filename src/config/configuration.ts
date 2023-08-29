@@ -13,5 +13,9 @@ export default () => ({
     auth: {
         saltHash: process.env.SALT_HASH,
         jwtSecret: process.env.JWT_SECRET
+    },
+    redis: {
+        host: process.env.REDIS_HOST || 'localhost',
+        port: process.env.REDIS_PORT || 6379
     }
 });

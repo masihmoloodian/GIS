@@ -10,8 +10,9 @@ import { AreaModule } from './area/area.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import configuration from './config/configuration';
-import { AuthGuard } from './auth/auth.guard';
-import { APP_GUARD } from '@nestjs/core';
+import type { RedisClientOptions } from 'redis';
+import * as redisStore from 'cache-manager-redis-store';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -32,6 +33,12 @@ import { APP_GUARD } from '@nestjs/core';
         synchronize: true,
       }),
       inject: [ConfigService]
+    }),
+    CacheModule.register<RedisClientOptions>({
+      store: redisStore,
+      isGlobal: true,
+      host: process.env.REDIS_HOST,
+      port: process.env.REDIS_PORT,
     }),
     UserModule,
     MapModule,
