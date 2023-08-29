@@ -4,10 +4,15 @@ import { hash } from 'bcrypt';
 import { MapEntity } from 'src/map/entities/map.entity';
 import { PointEntity } from 'src/point/entities/point.entity';
 import { AreaEntity } from 'src/area/entities/area.entity';
+import { ConfigService } from '@nestjs/config';
+require('dotenv').config()
 
 @Entity('users')
 export class UserEntity extends ParentEntity {
-    constructor(entity?: Partial<UserEntity>) {
+    constructor(
+        entity?: Partial<UserEntity>,
+        private configService?: ConfigService
+    ) {
         super()
         this.setArgumentToThisObject(entity)
     }

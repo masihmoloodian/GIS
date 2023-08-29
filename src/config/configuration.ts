@@ -9,5 +9,9 @@ export default () => ({
     app: {
         host: process.env.APP_HOST,
         port: parseInt(process.env.APP_PORT, 10) || 3000
+    },
+    auth: {
+        saltHash: process.env.SALT_HASH,
+        jwtSecret: process.env.JWT_SECRET
     }
 });
