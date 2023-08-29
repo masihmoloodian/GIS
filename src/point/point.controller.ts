@@ -1,34 +1,55 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { PointService } from './point.service';
 import { CreatePointDto } from './dto/create-point.dto';
 import { UpdatePointDto } from './dto/update-point.dto';
+import { UserEntity } from 'src/user/entities/user.entity';
+import { User } from 'src/user/user.decorator';
+import { ApiOperation, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from 'src/auth/auth.guard';
 
+@ApiTags('Points')
 @Controller('point')
 export class PointController {
-  constructor(private readonly pointService: PointService) {}
+  constructor(private readonly pointService: PointService) { }
 
+
+  @ApiOperation({ summary: 'Create a new point' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   @Post()
-  create(@Body() createPointDto: CreatePointDto) {
-    return this.pointService.create(createPointDto);
+  async create(@User() user: UserEntity, @Body() dto: CreatePointDto) {
+    return this.pointService.create(user.id, dto);
   }
 
+  @ApiOperation({ summary: 'Get all user points' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   @Get()
-  findAll() {
-    return this.pointService.findAll();
+  async getAll(@User() user: UserEntity) {
+    return this.pointService.getAllUserPoints(user.id);
   }
 
+  @ApiOperation({ summary: 'Get a user point' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.pointService.findOne(+id);
+  async getById(@User() user: UserEntity, @Param('id') id: number) {
+    return this.pointService.getById(user.id, id);
   }
 
+  @ApiOperation({ summary: 'Update a user point' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePointDto: UpdatePointDto) {
-    return this.pointService.update(+id, updatePointDto);
+  async update(@User() user: UserEntity, @Param('id') id: string, @Body() updatePointDto: UpdatePointDto) {
+    return this.pointService.update(user.id, +id, updatePointDto);
   }
 
+  @ApiOperation({ summary: 'Delete a user point' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.pointService.remove(+id);
+  async remove(@User() user: UserEntity, @Param('id') id: string) {
+    return this.pointService.remove(user.id, +id);
   }
 }

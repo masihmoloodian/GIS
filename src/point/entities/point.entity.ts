@@ -2,6 +2,7 @@ import { MapEntity } from 'src/map/entities/map.entity';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { ParentEntity } from 'src/user/shared/entities/parent.entity';
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
+import { Point } from 'geojson';
 
 @Entity('points')
 export class PointEntity extends ParentEntity {
@@ -15,8 +16,8 @@ export class PointEntity extends ParentEntity {
     @Column()
     name: string;
 
-    @Column({ type: 'geography', spatialFeatureType: 'Point', srid: 4326 })
-    location: string;
+    @Column({ type: 'geometry', spatialFeatureType: 'Point' })
+    point: Point;
 
     @Column()
     user_id: string;

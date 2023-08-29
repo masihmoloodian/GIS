@@ -37,6 +37,6 @@ export class MapController {
   @UseGuards(AuthGuard)
   @Get('user/:id')
   getMapById(@User() user: UserEntity, @Param('id') id: number) {
-    return this.mapService.getMapById(user.id, id);
+    return this.mapService.getUserMapById(user.id, id);
   }
 }

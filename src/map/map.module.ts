@@ -12,5 +12,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   ],
   controllers: [MapController],
   providers: [MapService],
+  exports: [MapService]
 })
 export class MapModule { }
