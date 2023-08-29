@@ -13,6 +13,7 @@ async function bootstrap() {
     .setTitle('GIS')
     .setDescription('The GIS API description')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, swaggerOptions);
   SwaggerModule.setup('docs', app, document);
