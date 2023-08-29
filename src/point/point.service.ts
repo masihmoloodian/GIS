@@ -5,8 +5,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PointEntity } from './entities/point.entity';
 import { Repository } from 'typeorm';
 import { MapService } from 'src/map/map.service';
-import { UpdateUserDto } from 'src/user/dto/update-user.dto';
-import { log } from 'console';
 
 @Injectable()
 export class PointService {
@@ -21,7 +19,7 @@ export class PointService {
     const _point = new PointEntity()
     _point.point = {
       type: "Point",
-      coordinates: [dto.point.latitude, dto.point.longitude],
+      coordinates: dto.point,
     }
 
     const point = this.pointsRepository.create(new PointEntity({
@@ -64,7 +62,7 @@ export class PointService {
     if (dto.point) {
       _point.point = {
         type: "Point",
-        coordinates: [dto.point.latitude, dto.point.longitude],
+        coordinates: dto.point,
       }
       dto.point = _point.point
     }

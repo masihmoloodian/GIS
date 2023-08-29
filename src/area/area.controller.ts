@@ -1,34 +1,55 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { AreaService } from './area.service';
+import { UserEntity } from 'src/user/entities/user.entity';
+import { User } from 'src/user/user.decorator';
 import { CreateAreaDto } from './dto/create-area.dto';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from 'src/auth/auth.guard';
 import { UpdateAreaDto } from './dto/update-area.dto';
 
+@ApiTags('area')
 @Controller('area')
 export class AreaController {
-  constructor(private readonly areaService: AreaService) {}
+  constructor(private readonly areaService: AreaService) { }
 
+
+  @ApiOperation({ summary: 'Create a new area' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   @Post()
-  create(@Body() createAreaDto: CreateAreaDto) {
-    return this.areaService.create(createAreaDto);
+  create(@User() user: UserEntity, @Body() dto: CreateAreaDto) {
+    return this.areaService.create(user.id, dto);
   }
 
+  @ApiOperation({ summary: 'Get all user areas' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   @Get()
-  findAll() {
-    return this.areaService.findAll();
+  async getAllUserAreas(@User() user: UserEntity) {
+    return this.areaService.getAllUserAreas(user.id);
   }
 
+  @ApiOperation({ summary: 'Get a user area' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.areaService.findOne(+id);
+  findOne(@User() user: UserEntity, @Param('id') id: number) {
+    return this.areaService.getUserAreaById(user.id, +id);
   }
 
+  @ApiOperation({ summary: 'Update a  area' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAreaDto: UpdateAreaDto) {
-    return this.areaService.update(+id, updateAreaDto);
+  update(@User() user: UserEntity, @Param('id') id: number, @Body() dto: UpdateAreaDto) {
+    return this.areaService.update(user.id, +id, dto);
   }
 
+  @ApiOperation({ summary: 'delete a area' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.areaService.remove(+id);
+  remove(@User() user: UserEntity, @Param('id') id: string) {
+    return this.areaService.remove(user.id, +id);
   }
 }

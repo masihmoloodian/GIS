@@ -1,26 +1,96 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAreaDto } from './dto/create-area.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { AreaEntity } from './entities/area.entity';
+import { MapService } from 'src/map/map.service';
 import { UpdateAreaDto } from './dto/update-area.dto';
 
 @Injectable()
 export class AreaService {
-  create(createAreaDto: CreateAreaDto) {
-    return 'This action adds a new area';
+  constructor(
+    @InjectRepository(AreaEntity)
+    private readonly areaRepository: Repository<AreaEntity>,
+    private readonly mapService: MapService
+  ) { }
+
+  async create(userId: string, dto: CreateAreaDto): Promise<AreaEntity> {
+    const _area = new AreaEntity()
+    _area.boundary = {
+      type: "Polygon",
+      coordinates: dto.boundary,
+    }
+
+    const area = await this.areaRepository.save(new AreaEntity({
+      user_id: userId,
+      name: dto.name,
+      boundary: _area.boundary
+    }));
+
+    if (dto.mapsIds && dto.mapsIds.length > 0) {
+      await this.addMapsToArea(area.id, dto.mapsIds)
+    }
+    return area
   }
 
-  findAll() {
-    return `This action returns all area`;
+
+  async getUserAreaById(userId: string, id: number): Promise<AreaEntity> {
+    const point = await this.areaRepository.findOne({
+      where: {
+        id,
+        user_id: userId
+      },
+    })
+    if (!point) throw new NotFoundException()
+    return point
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} area`;
+  async getAllUserAreas(userId: string): Promise<AreaEntity[]> {
+    return await this.areaRepository.find({
+      where: {
+        user_id: userId
+      },
+      relations: ['maps']
+    })
   }
 
-  update(id: number, updateAreaDto: UpdateAreaDto) {
-    return `This action updates a #${id} area`;
+  async update(userId: string, id: number, dto: UpdateAreaDto): Promise<AreaEntity> {
+    const foundArea = await this.getUserAreaById(userId, id)
+
+    const _area = new AreaEntity()
+    if (dto.boundary) {
+      _area.boundary = {
+        type: "Polygon",
+        coordinates: dto.boundary,
+      }
+      dto.boundary = _area.boundary
+    }
+    if (dto.mapsIds && dto.mapsIds.length > 0) {
+      await this.addMapsToArea(foundArea.id, dto.mapsIds)
+    }
+    delete dto.mapsIds
+    await this.areaRepository.update(id, dto)
+    return await this.getUserAreaById(userId, id)
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} area`;
+  async remove(userId: string, id: number): Promise<void> {
+    const point = await this.getUserAreaById(userId, id)
+    await this.areaRepository.remove(point)
+  }
+
+  async addMapsToArea(areaId: number, mapIds: number[]): Promise<AreaEntity> {
+    const point = await this.areaRepository.createQueryBuilder("area")
+      .leftJoinAndSelect("area.maps", "maps")
+      .where("area.id = :areaId", { areaId })
+      .getOne();
+    if (!point.maps) point.maps = [];
+
+    const uniqueMapIds = [...new Set(mapIds)];
+    const existingMapIds = point.maps.map(map => map.id);
+    const newMapIds = uniqueMapIds.filter(id => !existingMapIds.includes(id));
+
+    const mapsToAdd = await this.mapService.getMapByIds(newMapIds);
+    point.maps.push(...mapsToAdd);
+    return await this.areaRepository.save(point);
   }
 }

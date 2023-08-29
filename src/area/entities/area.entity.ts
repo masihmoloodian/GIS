@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, ManyToMa
 import { ParentEntity } from 'src/user/shared/entities/parent.entity';
 import { MapEntity } from 'src/map/entities/map.entity';
 import { UserEntity } from 'src/user/entities/user.entity';
+import { Polygon } from 'geojson';
 
 @Entity('areas')
 export class AreaEntity extends ParentEntity {
@@ -15,8 +16,8 @@ export class AreaEntity extends ParentEntity {
     @Column()
     name: string;
 
-    @Column({ type: 'geography', spatialFeatureType: 'Polygon', srid: 4326 })
-    boundary: string;
+    @Column({ type: 'geography', spatialFeatureType: 'Polygon' })
+    boundary: Polygon;
 
     @Column()
     user_id: string;

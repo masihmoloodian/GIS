@@ -12,6 +12,8 @@ class PointDto {
     latitude: number
 }
 
+const sample = [-73.9819, 40.7681]
+
 export class CreatePointDto {
 
     @ApiProperty()
@@ -19,9 +21,9 @@ export class CreatePointDto {
     @IsNotEmpty()
     name: string
 
-    @ApiProperty()
+    @ApiProperty({ isArray: true, example: sample })
     @IsNotEmpty()
-    point: PointDto
+    point: number[]
 
     @ApiPropertyOptional({ type: Number, isArray: true })
     @IsOptional()
