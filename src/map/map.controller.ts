@@ -1,34 +1,39 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { MapService } from './map.service';
 import { CreateMapDto } from './dto/create-map.dto';
 import { UpdateMapDto } from './dto/update-map.dto';
+import { UserEntity } from 'src/user/entities/user.entity';
+import { User } from 'src/user/user.decorator';
+import { ApiOperation, ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from 'src/auth/auth.guard';
 
+@ApiTags('Maps')
 @Controller('map')
 export class MapController {
-  constructor(private readonly mapService: MapService) {}
+  constructor(private readonly mapService: MapService) { }
 
+
+  @ApiOperation({ summary: 'Create a new map' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
   @Post()
-  create(@Body() createMapDto: CreateMapDto) {
-    return this.mapService.create(createMapDto);
+  create(@User() user: UserEntity, @Body() dto: CreateMapDto) {
+    return this.mapService.create(user.id, dto);
   }
 
-  @Get()
-  findAll() {
-    return this.mapService.findAll();
+  @ApiOperation({ summary: 'Get all user maps' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @Get('user')
+  getAllUserMaps(@User() user: UserEntity) {
+    return this.mapService.getAllUserMaps(user.id);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.mapService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMapDto: UpdateMapDto) {
-    return this.mapService.update(+id, updateMapDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.mapService.remove(+id);
+  @ApiOperation({ summary: 'Get a user map' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @Get('user/:id')
+  getMapById(@User() user: UserEntity, @Param('id') id: number) {
+    return this.mapService.getMapById(user.id, id);
   }
 }
