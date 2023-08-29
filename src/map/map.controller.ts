@@ -27,7 +27,7 @@ export class MapController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @UseInterceptors(CacheInterceptor)
-  @Get('user')
+  @Get()
   getAllUserMaps(@User() user: UserEntity) {
     return this.mapService.getAllUserMaps(user.id);
   }
@@ -35,7 +35,7 @@ export class MapController {
   @ApiOperation({ summary: 'Get a user map' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
-  @Get('user/:id')
+  @Get('id')
   getMapById(@User() user: UserEntity, @Param('id') id: number) {
     return this.mapService.getUserMapById(user.id, id);
   }
