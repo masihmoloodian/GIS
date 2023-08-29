@@ -1,10 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreatePointDto } from './dto/create-point.dto';
+import { CreatePointDto, SearchPointDto } from './dto/create-point.dto';
 import { UpdatePointDto } from './dto/update-point.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PointEntity } from './entities/point.entity';
 import { Repository } from 'typeorm';
 import { MapService } from 'src/map/map.service';
+import { Point } from "typeorm"
 
 @Injectable()
 export class PointService {
@@ -94,5 +95,19 @@ export class PointService {
     const mapsToAdd = await this.mapService.getMapByIds(newMapIds);
     point.maps.push(...mapsToAdd);
     return await this.pointsRepository.save(point);
+  }
+
+  async search(dto: SearchPointDto) {
+    const origin: Point = {
+      type: "Point",
+      coordinates: dto.point,
+    }
+    const query = this.pointsRepository.manager
+      .createQueryBuilder(PointEntity, 'point')
+      .where("ST_Distance(point.point, ST_SetSRID(ST_GeomFromGeoJSON(:origin), ST_SRID(point.point))) = 0", { origin })
+      .setParameters({
+        origin: JSON.stringify(origin),
+      });
+    return await query.getMany();
   }
 }

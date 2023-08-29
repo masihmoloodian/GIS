@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { PointService } from './point.service';
-import { CreatePointDto } from './dto/create-point.dto';
+import { CreatePointDto, SearchPointDto } from './dto/create-point.dto';
 import { UpdatePointDto } from './dto/update-point.dto';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { User } from 'src/user/user.decorator';
@@ -51,5 +51,11 @@ export class PointController {
   @Delete(':id')
   async remove(@User() user: UserEntity, @Param('id') id: string) {
     return this.pointService.remove(user.id, +id);
+  }
+
+  @ApiOperation({ summary: 'Search' })
+  @Post('search')
+  async search(@Body() dto: SearchPointDto) {
+    return this.pointService.search(dto);
   }
 }

@@ -29,3 +29,9 @@ export class CreatePointDto {
     @IsOptional()
     mapsIds?: number[]
 }
+
+export class SearchPointDto {
+    @ApiProperty({ isArray: true, example: sample })
+    @IsNotEmpty()
+    point: number[]
+}
