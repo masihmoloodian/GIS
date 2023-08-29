@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateAreaDto } from './dto/create-area.dto';
+import { CreateAreaDto, SearchAreaDto } from './dto/create-area.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Polygon, Repository } from 'typeorm';
 import { AreaEntity } from './entities/area.entity';
 import { MapService } from 'src/map/map.service';
 import { UpdateAreaDto } from './dto/update-area.dto';
@@ -92,5 +92,21 @@ export class AreaService {
     const mapsToAdd = await this.mapService.getMapByIds(newMapIds);
     point.maps.push(...mapsToAdd);
     return await this.areaRepository.save(point);
+  }
+
+  async search(dto: SearchAreaDto) {
+    const boundary: Polygon = {
+      type: "Polygon",
+      coordinates: dto.boundary,
+    };
+
+    const query = this.areaRepository.manager
+      .createQueryBuilder(AreaEntity, 'area')
+      .where("ST_Intersects(area.boundary, ST_SetSRID(ST_GeomFromGeoJSON(:boundary), ST_SRID(area.boundary)))", { boundary })
+      .setParameters({
+        boundary: JSON.stringify(boundary),
+      });
+
+    return await query.getMany();
   }
 }

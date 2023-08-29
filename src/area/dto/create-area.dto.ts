@@ -26,3 +26,10 @@ export class CreateAreaDto {
     @IsOptional()
     mapsIds?: number[]
 }
+
+
+export class SearchAreaDto {
+    @ApiProperty({ isArray: true, example: sample })
+    @IsNotEmpty()
+    boundary: number[][][];
+}

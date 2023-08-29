@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@n
 import { AreaService } from './area.service';
 import { UserEntity } from 'src/user/entities/user.entity';
 import { User } from 'src/user/user.decorator';
-import { CreateAreaDto } from './dto/create-area.dto';
+import { CreateAreaDto, SearchAreaDto } from './dto/create-area.dto';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { UpdateAreaDto } from './dto/update-area.dto';
@@ -51,5 +51,11 @@ export class AreaController {
   @Delete(':id')
   remove(@User() user: UserEntity, @Param('id') id: string) {
     return this.areaService.remove(user.id, +id);
+  }
+
+  @ApiOperation({ summary: 'Search' })
+  @Post('search')
+  async search(@Body() dto: SearchAreaDto) {
+    return this.areaService.search(dto);
   }
 }
