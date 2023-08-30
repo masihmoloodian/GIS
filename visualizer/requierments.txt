@@ -1,0 +1,5 @@
+streamlit
+folium
+watchdog
+branca
+streamlit-folium
