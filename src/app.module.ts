@@ -13,6 +13,7 @@ import configuration from './config/configuration';
 import type { RedisClientOptions } from 'redis';
 import * as redisStore from 'cache-manager-redis-store';
 import { CacheModule } from '@nestjs/cache-manager';
+import { LlmModule } from './llm/llm.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { CacheModule } from '@nestjs/cache-manager';
     PointModule,
     AreaModule,
     AuthModule,
+    LlmModule,
   ],
   controllers: [AppController],
   providers: [AppService],
