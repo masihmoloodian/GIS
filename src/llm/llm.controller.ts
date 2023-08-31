@@ -1,8 +1,9 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { LlmService } from './llm.service';
 import { LLMDto } from './dto/create-llm.dto';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('LLM')
 @Controller('llm')
 export class LlmController {
   constructor(private readonly llmService: LlmService) { }
